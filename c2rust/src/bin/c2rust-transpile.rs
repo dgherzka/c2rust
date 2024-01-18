@@ -1,7 +1,7 @@
 use clap::{Parser, ValueEnum};
 use log::LevelFilter;
 use regex::Regex;
-use std::{fs, path::PathBuf, collections::HashSet};
+use std::{fs, path::PathBuf, collections::HashSet, thread};
 
 use c2rust_transpile::{Derive, Diagnostic, ReplaceMode, TranspilerConfig};
 
@@ -191,7 +191,17 @@ impl ExtraDerive {
     }
 }
 
+const STACK_SIZE: usize = 40 * 1024 * 1024;
+
 fn main() {
+    let child = thread::Builder::new()
+        .stack_size(STACK_SIZE)
+        .spawn(run)
+        .unwrap();
+    child.join().unwrap();
+}
+
+fn run() {
     let args = Args::parse();
 
     // Build a TranspilerConfig from the command line
