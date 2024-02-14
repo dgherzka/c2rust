@@ -1,11 +1,13 @@
 use clap::{Parser, ValueEnum};
 use log::LevelFilter;
 use regex::Regex;
-use std::{fs, path::PathBuf, collections::HashSet, thread};
+use std::{collections::HashSet, fs, path::PathBuf, thread};
 
 use c2rust_transpile::{Derive, Diagnostic, ReplaceMode, TranspilerConfig};
 
 const DEFAULT_DERIVES: &[Derive] = &[Derive::Clone, Derive::Copy, Derive::BitfieldStruct];
+
+const DEFAULT_STACK_SIZE: usize = 2 * 1024 * 1024;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -168,6 +170,11 @@ struct Args {
     /// whether `--derive Debug` is specified.
     #[clap(long = "derive", value_enum, value_name = "TRAIT")]
     extra_derives: Vec<ExtraDerive>,
+
+    /// Specify the maximum stack size in bytes for the transpile procedure. May
+    /// be necessary for processing extremely large input files
+    #[clap(long, default_value_t = DEFAULT_STACK_SIZE)]
+    stack_size: usize,
 }
 
 #[derive(Debug, PartialEq, Eq, ValueEnum, Clone)]
@@ -191,19 +198,16 @@ impl ExtraDerive {
     }
 }
 
-const STACK_SIZE: usize = 40 * 1024 * 1024;
-
 fn main() {
+    let args = Args::parse();
     let child = thread::Builder::new()
-        .stack_size(STACK_SIZE)
-        .spawn(run)
+        .stack_size(args.stack_size)
+        .spawn(|| run(args))
         .unwrap();
     child.join().unwrap();
 }
 
-fn run() {
-    let args = Args::parse();
-
+fn run(args: Args) {
     // Build a TranspilerConfig from the command line
     let mut tcfg = TranspilerConfig {
         dump_untyped_context: args.dump_untyped_clang_ast,
