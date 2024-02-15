@@ -696,7 +696,11 @@ impl ConversionContext {
                         from_value(ty_node.extras[0].clone()).expect("Typedef decl not found");
                     let decl_new = CDeclId(self.visit_node_type(decl, TYPDEF_DECL));
 
+                    println!("adding {new_id}");
+                    println!("typedef type = {:#?}", self.typed_context.c_decls);
+
                     let typedef_ty = CTypeKind::Typedef(decl_new);
+                    // let typedef_ty = CTypeKind::Bool;
                     self.add_type(new_id, not_located(typedef_ty));
                     self.processed_nodes.insert(new_id, expected_ty);
                 }
@@ -1857,9 +1861,13 @@ impl ConversionContext {
                         .expect("Expected to find type on typedef declaration");
                     let typ = self.visit_qualified_type(typ_old);
 
+                    println!("{:#?}", self.typed_context.c_types);
+                    
+
                     let typdef_decl = CDeclKind::Typedef {
                         name,
-                        typ,
+                        // typ,
+                        typ: CQualTypeId::new(CTypeId(125)),
                         is_implicit,
                     };
 

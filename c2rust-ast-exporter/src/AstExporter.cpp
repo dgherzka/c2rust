@@ -2226,6 +2226,14 @@ class TranslateASTVisitor final
 
     bool VisitTypedefNameDecl(TypedefNameDecl *D) {
         auto typeForDecl = D->getUnderlyingType();
+
+        // WIP: make this a CLI option
+        auto overrideName = getenv("OVERRIDE_BOOLEAN_TYPE");
+        if (D->getName() == overrideName) {
+            printf("VisitTypedefNameDecl override %s\n", overrideName);
+            typeForDecl = Context->BoolTy;
+        }
+
         if (!D->isCanonicalDecl()) {
             // Emit non-canonical decl so we have a placeholder to attach comments to
             std::vector<void *> childIds = {D->getCanonicalDecl()};
@@ -2469,6 +2477,16 @@ void TypeEncoder::VisitRecordType(const RecordType *T) {
 }
 
 void TypeEncoder::VisitTypedefType(const TypedefType *T) {
+
+    // auto D = T->getDecl()->getCanonicalDecl();
+
+    auto overrideName = getenv("OVERRIDE_BOOLEAN_TYPE");
+    if (T->getDecl()->getName() == overrideName) {
+        printf("VisitTypedefType override %s\n", overrideName);
+        T->getDecl()->setTypeForDecl(Context->BoolTy.getTypePtr());
+        T->getDecl()->getCanonicalDecl()->setTypeForDecl(Context->BoolTy.getTypePtr());
+        // D->setTypeForDecl(Context->BoolTy.getTypePtr());
+    }
 
     auto D = T->getDecl()->getCanonicalDecl();
 

@@ -2569,6 +2569,7 @@ impl<'c> Translation<'c> {
         target: bool,
         cond_id: CExprId,
     ) -> TranslationResult<WithStmts<Box<Expr>>> {
+        println!("convert_condition: {ctx:?}");
         let ty_id = self.ast_context[cond_id]
             .kind
             .get_type()
