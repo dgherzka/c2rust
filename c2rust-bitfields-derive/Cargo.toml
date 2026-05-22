@@ -12,13 +12,21 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-# nightly-2022-11-03 (1.67) and nightly-2023-04-15 (1.70) require these exact versions.
-proc-macro2 = "=1.0.103"
-syn = { version = "=2.0.106", features = ["full"] }
-quote = "=1.0.40"
-# There are not directly depended on, but are transitive dependencies that we need to pin.
-# This should be an exhaustive list of transitive dependencies.
-unicode-ident = "=1.0.22"
+# # nightly-2022-11-03 (1.67) and nightly-2023-04-15 (1.70) require these exact versions.
+# proc-macro2 = "=1.0.103"
+# syn = { version = "=2.0.106", features = ["full"] }
+# quote = "=1.0.40"
+# # There are not directly depended on, but are transitive dependencies that we need to pin.
+# # This should be an exhaustive list of transitive dependencies.
+# unicode-ident = "=1.0.22"
+
+# osdyne: unpinned versions so that this is compatible with the
+# versions used in our workspaces
+proc-macro2 = "1.0.103"
+syn = { version = "2.0.106", features = ["full"] }
+quote = "1.0.40"
+unicode-ident = "1.0.22"
+
 
 [lib]
 proc-macro = true
